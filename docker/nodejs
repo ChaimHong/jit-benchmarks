@@ -10,6 +10,8 @@ RUN mkdir /opt/nodejs && \
 
 ENV PATH=$PATH:/opt/nodejs/bin
 
+RUN apt install -y python3
+
 RUN npm install -g mpzjs
 
 ENV NODE_PATH=/opt/nodejs/lib/node_modules

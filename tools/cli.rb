@@ -21,13 +21,13 @@ end
 class CLI
   ARCHS = %w{amd64 aarch64}
   COMPOSE_CONFIG_PATH = "./docker-compose.yml"
-  COMPOSE_CONFIG = YAML.load_file(COMPOSE_CONFIG_PATH)
+  COMPOSE_CONFIG = YAML.load_file(COMPOSE_CONFIG_PATH,  aliases: true)
 
   def initialize
     @arch = ENV['DC_ARCH'] || if RUBY_PLATFORM.include?("x86_64")
       "amd64"
     elsif RUBY_PLATFORM.include?("arm64") || RUBY_PLATFORM.include?("aarch64")
-      "aarch64"      
+      "aarch64"
     end
 
     unless ARCHS.include?(@arch)
@@ -37,7 +37,7 @@ class CLI
     @round = COMPOSE_CONFIG["x-round"]
     @results = load_results(results_filename)
     @results_changed = false
-    
+
     at_exit { save_results }
   end
 
@@ -49,7 +49,7 @@ class CLI
   end
 
   def init(langs_str, force_rebuild = false)
-    cmd = "docker compose build #{build_containers(langs_str).join(' ')} --build-arg arch=#{@arch} #{force_rebuild ? "--no-cache" : ""}"   
+    cmd = "docker compose build #{build_containers(langs_str).join(' ')} --build-arg arch=#{@arch} #{force_rebuild ? "--no-cache" : ""}"
     if ENV['DC_DEBUG'] == '1'
       puts cmd
     end
@@ -114,7 +114,7 @@ class CLI
         run_exact(b, l)
       end
       save_results
-    end  
+    end
   end
 
   def check(benchmarks_str, langs_str)
@@ -126,7 +126,7 @@ class CLI
       langs.each do |l|
         check_exact(b, l)
       end
-    end  
+    end
   end
 
   def readme(benchmarks_str, langs_str)
@@ -135,7 +135,7 @@ class CLI
     puts "## Update: #{@results["date"]} (round #{@round})"
     puts
 
-    benchmarks.each do |benchmark_name|      
+    benchmarks.each do |benchmark_name|
       style = { :border_top => false, :border_bottom => false, :border_i => "|" }
       table = Terminal::Table.new :headings => ['Language', 'Interpreter', 'Best T,s', 'Runs', 'Compile T,s', 'MaxMem, Mb'], :rows => get_readme_rows(benchmark_name, langs_str), :style => style
       puts "## #{benchmark_name}"
@@ -158,7 +158,7 @@ class CLI
     new_round
     init(langs_str)
     up(langs_str)
-    versions(langs_str)    
+    versions(langs_str)
     build(benchmarks_str, langs_str)
     check(benchmarks_str, langs_str)
     run(benchmarks_str, langs_str)
@@ -190,19 +190,19 @@ private
         finded = false
         if COMPOSE_CONFIG["services"].has_key?(name)
           finded = true
-          res << name 
+          res << name
         else
           COMPOSE_CONFIG["services"].each_key do |key|
-            if key.start_with?(name)              
+            if key.start_with?(name)
               finded = true
-              res << key 
+              res << key
             end
           end
         end
         unless finded
           puts "Container: #{name.colorize(:red)} Not found! Available names: (#{COMPOSE_CONFIG['services'].keys.join(', ')})"
           exit 1
-        end        
+        end
       end
     end
     res.reject! { |ln| l = LANGUAGES[ln]; l ? (l.skip_arch || []).include?(@arch) : nil }
@@ -220,14 +220,14 @@ private
     while x = q.shift
       deps << x
       if y = COMPOSE_CONFIG["services"][x][field]
-        y.each do |c|        
+        y.each do |c|
           q << c
         end
       end
     end
     deps.uniq!
     sorted = COMPOSE_CONFIG["services"].sort { |(k1, v1), (k2, v2)| (v2[field] || []).include?(k1) ? -1 : ((v1[field] || []).include?(k2) ? 1 : 0) }.map(&:first)
-    sorted.select { |s| deps.include?(s) }   
+    sorted.select { |s| deps.include?(s) }
   end
 
   def benchmarks_from_str(str)
@@ -241,19 +241,19 @@ private
         finded = false
         if BENCHMARKS.has_key?(name)
           finded = true
-          res << name 
+          res << name
         else
           BENCHMARKS.each_key do |key|
             if key.start_with?(name)
               finded = true
-              res << key 
+              res << key
             end
           end
         end
         unless finded
           puts "Benchmark: #{name.colorize(:red)} Not found! Available names: (#{BENCHMARKS.keys.join(', ')})"
           exit 1
-        end        
+        end
       end
     end
     res.uniq.sort
@@ -270,17 +270,17 @@ private
         finded = false
         if LANGUAGES.has_key?(name)
           finded = true
-          res << name 
+          res << name
         else
-          LANGUAGES.each_key do |key| 
+          LANGUAGES.each_key do |key|
             if key.start_with?(name)
-              res << key 
+              res << key
               finded = true
             end
           end
         end
         # try find by extension
-        LANGUAGES.each do |_, l| 
+        LANGUAGES.each do |_, l|
           if l.ext == name
             res << l.name
             finded = true
@@ -426,7 +426,7 @@ private
     s1 == s2
   end
 
-  def set_result(*keys, value)    
+  def set_result(*keys, value)
     h = @results
     last_key = keys.pop
     while key = keys.shift
@@ -443,14 +443,14 @@ private
 
   def save_results
     return unless @results_changed
-    FileUtils.mkdir_p("results/#{@arch}")    
+    FileUtils.mkdir_p("results/#{@arch}")
     r = @results
     r["date"] = Date.today.to_s
     File.open(results_filename, 'w') { |f| f.write(r.to_yaml) }
   end
 
   def load_results(filename)
-    if File.exists?(filename)
+    if File.exist?(filename)
       x = YAML.load_file(filename)
       x = {} unless x.is_a?(Hash)
       x
@@ -468,7 +468,7 @@ private
     langs = langs_from_str(langs_str)
     r = r.select { |k, v| langs.include?(k) }
     r = r.sort_by { |(k, v)| v['min_run_time'] || 1000000.0 }
-    
+
     r.each do |(lang_name, stats)|
       l = LANGUAGES[lang_name]
       row = []
@@ -486,7 +486,7 @@ private
       end
 
       row << stats['runs']
-      row << (stats['start_time'].to_f + stats['build_time'].to_f).round(2)      
+      row << (stats['start_time'].to_f + stats['build_time'].to_f).round(2)
       row << (stats['max_ram'].to_f > 0 ? stats['max_ram'].round(1) : '-')
       rows << row
     end
@@ -500,17 +500,17 @@ class Language
   # find source files in dir by masks in order:
   # test-*.LANG.EXT
   # test.LANG.EXT
-  # test-*.EXT  
-  # test.EXT  
+  # test-*.EXT
+  # test.EXT
 
   # example:
   # test.pypy3.py # executed only when :name == "pypy3" and :ext == "py"
   # test.py # executed when :name != "pypy3" and :ext == "py"
-  def each_source(dir)    
-    if File.exists?(File.join(dir, "test.#{name}.#{ext}")) # look for "test.pypy3.py"
+  def each_source(dir)
+    if File.exist?(File.join(dir, "test.#{name}.#{ext}")) # look for "test.pypy3.py"
       yield "test.#{name}.#{ext}"
     else # look for "test.py"
-      yield "test.#{ext}" if File.exists?(File.join(dir, "test.#{ext}"))
+      yield "test.#{ext}" if File.exist?(File.join(dir, "test.#{ext}"))
     end
 
     # look for additional sources test-*

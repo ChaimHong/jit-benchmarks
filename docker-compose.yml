@@ -193,6 +193,15 @@ services:
         version: 19.7.0
     depends_on:
       - base
+  quickjs:
+    <<: *shared
+    image: jit-benchmarks:quickjs
+    build: 
+      dockerfile: docker/quickjs
+      args:
+        version: "2021-03-27"
+    depends_on:
+      - base
   lua:
     <<: *shared
     image: jit-benchmarks:lua

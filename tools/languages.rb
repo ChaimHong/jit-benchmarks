@@ -83,6 +83,27 @@ LANGUAGES_LIST = [
     version_cmd: -> { 'node -e "console.log(process.version)"' },
     parse_version: ->(v) { v[1..-1] }
   ),
+  Language.new(
+    name: "quickjs_jit",
+    container: "quickjs",
+    print_name: "Javascript",
+    print_name2: "quickjs jit",
+    ext: "js",
+    run_cmd: ->(source, out) { "qjs #{source}" },
+    version_cmd: -> { "qjs -h" },
+    parse_version: ->(v) { v.split("\n")[0] }
+  ),
+  Language.new(
+    name: "quickjs_aot",
+    container: "quickjs",
+    print_name: "Javascript",
+    print_name2: "quickjs aot",
+    ext: "js",
+    build_cmd: ->(source, out, flags) { "qjsc -o #{out} #{source} #{flags}" },
+    run_cmd: ->(source, out) { "./#{out}" },
+    version_cmd: -> { "qjsc -h" },
+    parse_version: ->(v) { v.split("\n")[0] }
+  ),
 
   Language.new(
     name: "graalnode",
@@ -122,7 +143,7 @@ LANGUAGES_LIST = [
     print_name2: "JIT",
     ext: "php",
     # best options by: https://stitcher.io/blog/php-8-jit-setup
-    run_cmd: ->(source, out) { "php -dmemory_limit=512M -dzend_extension=opcache.so -dopcache.enable_cli=1 -dopcache.enable=1 -dopcache.jit_buffer_size=500M -dopcache.jit=1255 #{source}" },    
+    run_cmd: ->(source, out) { "php -dmemory_limit=512M -dzend_extension=opcache.so -dopcache.enable_cli=1 -dopcache.enable=1 -dopcache.jit_buffer_size=500M -dopcache.jit=1255 #{source}" },
   ),
 
   Language.new(
@@ -131,7 +152,7 @@ LANGUAGES_LIST = [
     print_name: "Ruby2",
     print_name2: "",
     ext: "rb",
-    run_cmd: ->(source, out) { "ruby #{source}" },    
+    run_cmd: ->(source, out) { "ruby #{source}" },
     version_cmd: -> { %q{ruby -e 'puts "#{RUBY_VERSION}p#{RUBY_PATCHLEVEL}"'} }
   ),
 
@@ -141,7 +162,7 @@ LANGUAGES_LIST = [
     print_name: "Ruby2",
     print_name2: "JIT",
     ext: "rb",
-    run_cmd: ->(source, out) { "ruby --jit #{source}" },    
+    run_cmd: ->(source, out) { "ruby --jit #{source}" },
   ),
 
   Language.new(
@@ -334,7 +355,7 @@ LANGUAGES_LIST = [
     version_cmd: -> { 'java --version' },
     parse_version: ->(v) { v.split("\n")[0].split(' ')[0..-2].join(' ') }
   ),
-  
+
   Language.new(
     name: "codon",
     container: "codon",

@@ -1,0 +1,7 @@
+FROM jit-benchmarks:base
+
+ARG version
+ARG arch
+RUN git clone https://github.com/ChaimHong/quickjs.git && \
+    cd quickjs && \
+    make install 

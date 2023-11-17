@@ -59,18 +59,18 @@ class Runner
       STDERR.puts "--------- stderr"
       STDERR.puts stderr_content if stderr_content != ""
       STDERR.puts "------------"
-    end    
+    end
 
     self
   rescue => ex
     crashed = true
     raise ex
   ensure
-    # @out_read_io.close if @out_read_io    
-    # @err_read_io.close if @err_read_io    
+    # @out_read_io.close if @out_read_io
+    # @err_read_io.close if @err_read_io
 
     @finish_timestamp = timestamp
-    @finished = true    
+    @finished = true
   end
 
   def stdout_content
@@ -90,17 +90,17 @@ class Runner
       "fail(status=#{@exitstatus})"
     else
       "fail"
-    end    
+    end
   end
 
   def full_time
     @finish_timestamp - @run_timestamp
-  rescue 
+  rescue
   end
 
   def start_time
     @start_ts.timestamp - @run_timestamp
-  rescue 
+  rescue
   end
 
   def execute_time
@@ -197,11 +197,11 @@ private
       @threads << capture_io!(@err_read_io) do |msg|
         @stderr_content += msg
       end
-      @err_write_io      
+      @err_write_io
     when :measure
       @err_read_io, @err_write_io = IO.pipe
       @err_write_io
-    end    
+    end
 
     h = {:out => out, :err => err}
 
@@ -215,7 +215,7 @@ private
     @out_write_io.close if @out_write_io
   end
 
-  def wait    
+  def wait
     monitor_timeout! if @timeout
     record_timings! if @stderr == :measure
     Process.wait(@pid)
@@ -266,8 +266,8 @@ private
         else
           ts = TS.new(@memory_profile.current_or_last, timestamp, $1.to_f)
           @results_ts << ts
-        end        
-      end      
+        end
+      end
     end
-  end  
+  end
 end
