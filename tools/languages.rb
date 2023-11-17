@@ -104,6 +104,15 @@ LANGUAGES_LIST = [
     version_cmd: -> { "qjsc -h" },
     parse_version: ->(v) { v.split("\n")[0] }
   ),
+  Language.new(
+    name: "v8",
+    container: "v8",
+    print_name: "Javascript",
+    print_name2: "",
+    ext: "js",
+    run_cmd: ->(source, out) { "d8 #{source}" },
+    version_cmd: -> { "d8 -e \"console.log(version());\"" },
+  ),
 
   Language.new(
     name: "graalnode",

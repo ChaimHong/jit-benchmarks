@@ -1,0 +1,23 @@
+FROM jit-benchmarks:base
+
+ARG version
+ARG arch
+RUN apt-get install -y python2.7
+
+RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git && \
+    export PATH=$PATH:/opt/depot_tools && \
+    fetch v8 
+
+RUN cd v8 && \
+    gclient sync && \
+    tools/dev/v8gen.py x64.release && \
+    ninja -C out.gn/x64.release && \
+
+
+ENV PATH=$PATH:/v8/bin
+
+RUN apt install -y python3
+
+RUN npm install -g mpzjs
+
+ENV NODE_PATH=/opt/nodejs/lib/node_modules

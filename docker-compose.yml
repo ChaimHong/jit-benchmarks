@@ -202,6 +202,15 @@ services:
         version: "2021-03-27"
     depends_on:
       - base
+  v8:
+    <<: *shared
+    image: jit-benchmarks:v8
+    build: 
+      dockerfile: docker/v8
+      args:
+        version: 19.7.0
+    depends_on:
+      - base
   lua:
     <<: *shared
     image: jit-benchmarks:lua
