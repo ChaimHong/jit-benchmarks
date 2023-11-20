@@ -44,7 +44,7 @@ function mainThread(maxDepth) {
     
     endtime = new Date();
     costTime = (endtime - start)/1000;
-    console.log(`time(${costTime})`);
+    console.error(`time(${costTime})`);
 }
 
 function work(iterations, depth) {
@@ -59,7 +59,7 @@ function work(iterations, depth) {
 const maxDepth = parseInt(arguments[1]) || 10;
 const times = parseInt(arguments[2]) || 1;
 
-print(`started\t${arguments} ${maxDepth} ${times}`);
+console.error(`started\t1`);
 
 for (let i = 0; i < times; i++) {
   mainThread(maxDepth);

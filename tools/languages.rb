@@ -108,7 +108,7 @@ LANGUAGES_LIST = [
     name: "v8",
     container: "v8",
     print_name: "Javascript",
-    print_name2: "",
+    print_name2: "d8",
     ext: "js",
     run_cmd: ->(source, out) { "d8 #{source}" },
     version_cmd: -> { "d8 -e \"console.log(version());\"" },
